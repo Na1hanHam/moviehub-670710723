@@ -67,7 +67,11 @@ export function removeFromWishlist(movieId, token) {
 // ---------- หนัง (สัปดาห์หน้า: เปลี่ยนหน้า Movies จาก tmdb.js มาใช้ตัวนี้) ----------
 export async function getMovies() {
   const data = await apiFetch('/api/movies');
-  return data.items;
+  const items = Array.isArray(data) ? data : data?.items;
+  if (!Array.isArray(items)) {
+    throw new Error('รูปแบบข้อมูลหนังไม่ถูกต้อง: API ต้องตอบเป็นรายการหนัง หรือ { items: [...] }');
+  }
+  return items;
 }
 
 export async function getMovie(movieId){

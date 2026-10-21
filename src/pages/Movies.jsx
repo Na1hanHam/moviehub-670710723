@@ -31,6 +31,7 @@ function Movies() {
 
     async function load() {
       setStatus('loading');
+      setError(null);
       try {
         const list = await getMovies();            // ครั้งแรกของวันยิง API ครั้งถัดไปอ่านจาก localStorage
         if (!ignore) {

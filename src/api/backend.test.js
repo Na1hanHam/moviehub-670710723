@@ -1,4 +1,4 @@
-import { apiFetch, login, postReview } from './backend';
+import { apiFetch, getMovies, login, postReview } from './backend';
 
 function fakeResponse(status, body){
     return {
@@ -67,4 +67,20 @@ test('server ตอบมาไม่ใช่ JSON (เช่น ลืมร�
   fetch.mockResolvedValue({ ok: false, status: 404, json: () => Promise.reject(new SyntaxError('Unexpected token <')) });
 
   await expect(apiFetch('/api/movies')).rejects.toThrow('server ไม่ได้ตอบเป็น JSON');
+});
+
+test('getMovies รองรับรูปแบบ { items } และรายการ JSON ตรง ๆ', async () => {
+  const movies = [{ id: 1, title: 'Parasite' }];
+
+  fetch.mockResolvedValueOnce(fakeResponse(200, { items: movies }));
+  await expect(getMovies()).resolves.toEqual(movies);
+
+  fetch.mockResolvedValueOnce(fakeResponse(200, movies));
+  await expect(getMovies()).resolves.toEqual(movies);
+});
+
+test('getMovies โยน error ที่เข้าใจได้เมื่อ API ไม่ได้ส่งรายการหนัง', async () => {
+  fetch.mockResolvedValue(fakeResponse(200, { data: [] }));
+
+  await expect(getMovies()).rejects.toThrow('รูปแบบข้อมูลหนังไม่ถูกต้อง');
 });
